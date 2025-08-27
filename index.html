@@ -4,146 +4,111 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Client Tracker — Wanted Poster Edition</title>
-  <meta name="description" content="A fun client tracker that renders One Piece–style 'Wanted' posters (and an optional coin view) with name, approval amount, and notes." />
+  <meta name="description" content="A fun client tracker that renders One Piece–style 'Wanted' posters (and an optional coin view) with name, approval amount, notes, badges, stages, agents, sounds, and a leaderboard." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Crimson+Text:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --paper:#f3e7cf;        /* parchment */
-      --ink:#2a1e12;          /* dark ink */
-      --sepia: #6b5137;       /* sepia lines */
-      --accent:#b28b5e;       /* gold-ish */
-      --shadow: rgba(0,0,0,.18);
+      --paper:#f3e7cf; --ink:#2a1e12; --sepia:#6b5137; --accent:#b28b5e; --shadow:rgba(0,0,0,.18);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0; color:var(--ink);
-      background:
-        radial-gradient(1200px 800px at 10% -10%, #fff6e6 0, transparent 60%),
-        radial-gradient(1400px 900px at 110% 110%, #fff0d8 0, transparent 60%),
-        #efe3cc;
-      font-family: "Crimson Text", serif;
+    body{margin:0; color:var(--ink);
+      background:radial-gradient(1200px 800px at 10% -10%, #fff6e6 0, transparent 60%),
+                 radial-gradient(1400px 900px at 110% 110%, #fff0d8 0, transparent 60%), #efe3cc;
+      font-family:"Crimson Text", serif;
     }
-    header{
-      position:sticky; top:0; z-index:5;
-      backdrop-filter: blur(6px);
-      background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.55));
+    header{position:sticky; top:0; z-index:10; backdrop-filter: blur(6px);
+      background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.55));
       border-bottom:1px solid #e7d8b8;
     }
-    .wrap{max-width:1100px; margin:0 auto; padding:1rem 1.25rem}
-    h1{
-      margin:0; letter-spacing:.06em; font-family:"IM Fell English SC", serif;
-      font-size: clamp(1.4rem, 2.6vw, 2.4rem);
-    }
-    .subtitle{opacity:.75; font-size:.95rem; margin:.15rem 0 0 .05rem}
+    .wrap{max-width:1200px; margin:0 auto; padding:1rem 1.25rem}
+    h1{margin:0; letter-spacing:.06em; font-family:"IM Fell English SC", serif; font-size:clamp(1.4rem,2.6vw,2.4rem)}
+    .subtitle{opacity:.8; font-size:.95rem; margin:.15rem 0 0 .05rem}
 
-    /* Layout */
-    .grid{
-      display:grid; gap:1rem; align-items:start;
-      grid-template-columns: 1fr; margin:1rem auto;
-    }
-    @media(min-width:980px){ .grid{ grid-template-columns: 330px 1fr; } }
+    .grid{display:grid; gap:1rem; align-items:start; grid-template-columns:1fr}
+    @media(min-width:1100px){.grid{grid-template-columns: 360px 1fr}}
 
-    /* Card */
-    .card{
-      background:var(--paper);
-      border:1px solid #e2d2ae;
-      border-radius:16px; box-shadow:0 10px 22px var(--shadow);
-      overflow:hidden
-    }
-    .card .head{
-      padding:1rem 1rem .5rem; display:flex; gap:.75rem; align-items:center; justify-content:space-between
-    }
-    .card h2{font-family:"IM Fell English SC", serif; letter-spacing:.04em; margin:0}
+    .card{background:var(--paper); border:1px solid #e2d2ae; border-radius:16px; box-shadow:0 10px 22px var(--shadow); overflow:hidden}
+    .head{padding:1rem; display:flex; gap:.75rem; align-items:center; justify-content:space-between}
     .muted{opacity:.8; font-size:.9rem}
 
-    label{display:block; font-weight:700; margin:.65rem 0 .25rem; letter-spacing:.02em}
-    input[type="text"], input[type="number"], textarea{
-      width:100%; padding:.65rem .75rem; border-radius:10px; border:1px solid #d7c4a0; background:#fffaf1;
-      box-shadow: inset 0 1px 0 rgba(0,0,0,.04);
-      font-family:inherit; font-size:1rem;
+    label{display:block; font-weight:700; margin:.55rem 0 .25rem; letter-spacing:.02em}
+    input[type="text"], input[type="number"], textarea, select{
+      width:100%; padding:.65rem .75rem; border-radius:10px; border:1px solid #d7c4a0; background:#fffaf1; box-shadow: inset 0 1px 0 rgba(0,0,0,.04); font:inherit
     }
-    textarea{min-height:96px; resize:vertical}
+    textarea{min-height:84px; resize:vertical}
 
-    /* Buttons */
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:.6rem}
+
+    .badge-list{display:flex; flex-wrap:wrap; gap:.45rem}
+    .chip{display:inline-flex; align-items:center; gap:.35rem; border:1px solid #cdb892; background:#fff6e5; padding:.35rem .6rem; border-radius:999px; font-weight:700; cursor:pointer}
+    .chip input{accent-color:#a2773e}
+
     .btns{display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem}
-    .btn{
-      border:1px solid #bda67f; background:linear-gradient(#fff7e3, #f2e2c2);
-      padding:.6rem .9rem; border-radius:999px; cursor:pointer; font-weight:700;
-      letter-spacing:.03em; box-shadow:0 2px 0 #d0b88c, 0 6px 18px var(--shadow);
-    }
+    .btn{border:1px solid #bda67f; background:linear-gradient(#fff7e3, #f2e2c2); padding:.6rem .9rem; border-radius:999px; cursor:pointer; font-weight:700; letter-spacing:.03em; box-shadow:0 2px 0 #d0b88c, 0 6px 18px var(--shadow)}
     .btn:active{transform:translateY(1px)}
     .btn.secondary{background:linear-gradient(#f7efe0,#e7d5b3)}
     .btn.danger{background:linear-gradient(#ffe5e2,#f6c2bc); border-color:#e3a39c}
     .btn.flat{background:transparent; border:1px dashed #bfae8e}
 
-    /* Poster */
-    .gallery{display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:1rem}
+    .toolbar{display:flex; flex-wrap:wrap; gap:.5rem; align-items:center}
+    .spacer{flex:1}
+    .search{padding:.55rem .8rem; border:1px solid #ccb68b; border-radius:999px; background:#fff7e7}
 
-    .poster{position:relative; padding:1rem; background:var(--paper);
-      border:2px solid #c6af85; border-radius:12px;
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,.03), 0 12px 24px var(--shadow);
-      filter: contrast(1.02) saturate(.95);
-    }
-    .poster::before{ /* deckle edges */
-      content:""; position:absolute; inset:0; pointer-events:none;
-      background:
-        radial-gradient(60% 40% at 20% 0%, rgba(0,0,0,.08) 0, transparent 55%),
-        radial-gradient(60% 40% at 80% 100%, rgba(0,0,0,.08) 0, transparent 55%),
-        linear-gradient(rgba(0,0,0,.06), transparent 30%, transparent 70%, rgba(0,0,0,.06));
-      mix-blend-mode:multiply; border-radius:12px
-    }
-    .poster .top{ text-align:center; font-family:"IM Fell English SC", serif; }
-    .poster .top .wanted{ font-size:2.2rem; letter-spacing:.15em; margin:.25rem 0 .35rem }
-    .poster .top .wanted small{ display:block; font-size:.78rem; letter-spacing:.25em; opacity:.7 }
+    .gallery{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1rem}
 
-    .photo{ aspect-ratio: 5/4; width:100%; border:3px solid #7a5c3a; border-radius:8px; overflow:hidden;
-      background:#d5c3a0 center/cover no-repeat; position:relative; margin:.5rem 0 .25rem
-    }
-    .photo img{ width:100%; height:100%; object-fit:cover; filter: sepia(.45) contrast(1.05) saturate(.9) }
-    .burn{ position:absolute; inset:0; background:
-      radial-gradient(220px 120px at -10% -20%, rgba(0,0,0,.16), transparent 60%),
-      radial-gradient(240px 140px at 110% 120%, rgba(0,0,0,.18), transparent 60%);
-      mix-blend-mode:multiply; pointer-events:none }
+    .poster{position:relative; padding:1rem; background:var(--paper); border:2px solid #c6af85; border-radius:12px; box-shadow: inset 0 0 0 2px rgba(0,0,0,.03), 0 12px 24px var(--shadow); filter: contrast(1.02) saturate(.95)}
+    .poster::before{content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(60% 40% at 20% 0%, rgba(0,0,0,.08) 0, transparent 55%), radial-gradient(60% 40% at 80% 100%, rgba(0,0,0,.08) 0, transparent 55%), linear-gradient(rgba(0,0,0,.06), transparent 30%, transparent 70%, rgba(0,0,0,.06)); mix-blend-mode:multiply; border-radius:12px}
 
-    .name{ font-family:"IM Fell English SC", serif; text-align:center; letter-spacing:.08em; font-size:1.25rem; margin:.25rem 0 .35rem }
-    .bounty{ text-align:center; font-weight:700; letter-spacing:.08em; margin:.1rem 0 .4rem }
-    .bounty .label{ opacity:.7; font-size:.9rem; display:block; }
-    .bounty .amount{ font-size:1.25rem }
+    .top{text-align:center; font-family:"IM Fell English SC", serif}
+    .wanted{font-size:2.1rem; letter-spacing:.15em; margin:.25rem 0 .35rem}
+    .wanted small{display:block; font-size:.78rem; letter-spacing:.25em; opacity:.7}
 
-    .notes{ font-size:.95rem; line-height:1.3; background:rgba(255,255,255,.5); border:1px dashed #c7b28a; padding:.5rem .6rem; border-radius:8px }
+    .photo{aspect-ratio: 5/4; width:100%; border:3px solid #7a5c3a; border-radius:8px; overflow:hidden; background:#d5c3a0 center/cover no-repeat; position:relative; margin:.5rem 0 .25rem}
+    .photo img{width:100%; height:100%; object-fit:cover; filter: sepia(.45) contrast(1.05) saturate(.9)}
+    .burn{position:absolute; inset:0; background:radial-gradient(220px 120px at -10% -20%, rgba(0,0,0,.16), transparent 60%), radial-gradient(240px 140px at 110% 120%, rgba(0,0,0,.18), transparent 60%); mix-blend-mode:multiply; pointer-events:none}
 
-    .foot{ display:flex; justify-content:space-between; align-items:center; margin-top:.6rem }
-    .sig{ font-family:"IM Fell English SC", serif; opacity:.75; letter-spacing:.08em }
+    .name{font-family:"IM Fell English SC"; text-align:center; letter-spacing:.08em; font-size:1.2rem; margin:.25rem 0 .2rem}
+    .bounty{text-align:center; font-weight:700; letter-spacing:.08em; margin:.1rem 0 .35rem}
+    .bounty .label{opacity:.7; font-size:.9rem; display:block}
+    .bounty .amount{font-size:1.2rem}
 
-    .mini-btns{ display:flex; gap:.35rem }
-    .mini-btns .btn{ padding:.35rem .6rem; font-size:.85rem }
+    .meta{display:flex; flex-wrap:wrap; gap:.4rem; justify-content:center; margin:.35rem 0}
+    .tag{border:1px dashed #b89e72; padding:.2rem .45rem; border-radius:999px; background:#fff8ea; font-weight:700; font-size:.85rem}
+
+    .notes{font-size:.95rem; line-height:1.3; background:rgba(255,255,255,.5); border:1px dashed #c7b28a; padding:.5rem .6rem; border-radius:8px}
+
+    .foot{display:flex; justify-content:space-between; align-items:center; margin-top:.6rem}
+    .sig{font-family:"IM Fell English SC"; opacity:.75; letter-spacing:.08em}
+    .mini-btns{display:flex; gap:.35rem}
+    .mini-btns .btn{padding:.35rem .6rem; font-size:.85rem}
+
+    .stamp{position:absolute; inset:40% 8% auto auto; transform:rotate(-12deg); border:3px solid #a33; color:#a33; font-weight:900; font-size:1.6rem; padding:.25rem .5rem; border-radius:6px; background:rgba(255,255,255,.85); text-shadow:0 1px 0 #fff; display:none}
 
     /* Coin view */
-    .coin{
-      width:220px; height:220px; border-radius:50%; margin:0 auto; position:relative;
-      background:
-        radial-gradient(160px 100px at 50% 30%, rgba(255,255,255,.35), transparent 60%),
-        radial-gradient(120px 120px at 30% 70%, rgba(0,0,0,.12), transparent 60%),
-        radial-gradient(circle at 50% 50%, #d6b77d 0, #b9965c 60%, #8d6f3d 100%);
-      border: 8px solid #c5a165;
-      box-shadow: inset 0 0 0 4px rgba(255,255,255,.25), inset 0 0 40px rgba(0,0,0,.25), 0 10px 24px var(--shadow);
-      display:grid; place-items:center; text-align:center; color:#3a2a12
-    }
-    .coin .coin-text{ font-family:"IM Fell English SC"; }
-    .coin .coin-text .amt{ font-size:1.15rem; font-weight:700 }
-    .coin .coin-text .nm{ font-size:1.05rem; opacity:.9 }
+    .coin{width:220px; height:220px; border-radius:50%; margin:.6rem auto 0; position:relative; background:radial-gradient(160px 100px at 50% 30%, rgba(255,255,255,.35), transparent 60%), radial-gradient(120px 120px at 30% 70%, rgba(0,0,0,.12), transparent 60%), radial-gradient(circle at 50% 50%, #d6b77d 0, #b9965c 60%, #8d6f3d 100%); border: 8px solid #c5a165; box-shadow: inset 0 0 0 4px rgba(255,255,255,.25), inset 0 0 40px rgba(0,0,0,.25), 0 10px 24px var(--shadow); display:grid; place-items:center; text-align:center; color:#3a2a12}
+    .coin .coin-text{font-family:"IM Fell English SC"}
+    .coin .amt{font-size:1.05rem; font-weight:700}
 
-    .toolbar{ display:flex; flex-wrap:wrap; gap:.5rem; align-items:center }
-    .spacer{ flex:1 }
-    .search{ padding:.55rem .8rem; border:1px solid #ccb68b; border-radius:999px; background:#fff7e7 }
+    .empty{text-align:center; opacity:.8; padding:2rem; border:2px dashed #d1bd95; border-radius:14px; background:rgba(255,255,255,.5)}
 
-    .empty{
-      text-align:center; opacity:.8; padding:2rem; border:2px dashed #d1bd95; border-radius:14px; background:rgba(255,255,255,.5)
-    }
-    .sr-only{ position:absolute; left:-9999px }
+    /* Right rail: analytics */
+    .board{margin-top:1rem; display:grid; grid-template-columns:1fr; gap:1rem}
+    @media(min-width:800px){.board{grid-template-columns:1fr 1fr}}
+    .tile{background:var(--paper); border:1px solid #e2d2ae; border-radius:12px; padding:1rem; box-shadow:0 8px 18px var(--shadow)}
+    .tile h3{margin:.1rem 0 .6rem; font-family:"IM Fell English SC"}
+    .list{display:grid; gap:.45rem}
+    .rowline{display:flex; justify-content:space-between; gap:.5rem}
+
+    .filters{display:flex; flex-wrap:wrap; gap:.5rem; align-items:center}
+    .filters select{min-width:160px}
+    .sr-only{position:absolute; left:-9999px}
+
+    /* Themes */
+    .theme-marine .wanted{letter-spacing:.12em}
+    .theme-map .poster{background:#efe2c2}
   </style>
 </head>
 <body>
@@ -152,10 +117,10 @@
       <div class="toolbar">
         <div>
           <h1>Client Tracker — Wanted Posters</h1>
-          <div class="subtitle">Collect client "bounties" as posters. Toggle coin mode for a collectible coin look.</div>
+          <div class="subtitle">Collect client "bounties"; assign agents; track stages; earn badges; export/import; PNGs; coin mode.</div>
         </div>
         <div class="spacer"></div>
-        <input id="q" class="search" placeholder="Search name or notes…" />
+        <input id="q" class="search" placeholder="Search name, notes, agent…" />
         <button class="btn flat" id="exportBtn" title="Export JSON">Export</button>
         <label class="btn flat" for="importInput" title="Import JSON">Import<input class="sr-only" id="importInput" type="file" accept="application/json"></label>
       </div>
@@ -164,6 +129,7 @@
 
   <main class="wrap">
     <div class="grid">
+      <!-- FORM -->
       <section class="card">
         <div class="head">
           <h2>Add / Edit Client</h2>
@@ -172,11 +138,43 @@
         <div style="padding:0 1rem 1.25rem">
           <form id="form">
             <input type="hidden" id="id" />
+
             <label for="name">Client Name *</label>
             <input id="name" type="text" required placeholder="Nami Arlong" />
 
-            <label for="amount">Approved Amount (USD) *</label>
-            <input id="amount" type="number" required min="0" step="1000" placeholder="450000" />
+            <div class="row">
+              <div>
+                <label for="amount">Approved Amount (USD) *</label>
+                <input id="amount" type="number" required min="0" step="1000" placeholder="450000" />
+              </div>
+              <div>
+                <label for="agent">Assigned Agent *</label>
+                <input id="agent" type="text" required placeholder="Devin Brown" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="stage">Stage</label>
+                <select id="stage">
+                  <option value="Pre-Approval">Pre-Approval</option>
+                  <option value="Searching">Searching</option>
+                  <option value="Under Contract">Under Contract</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+              <div>
+                <label for="theme">Poster Theme</label>
+                <select id="theme">
+                  <option value="wanted">Wanted</option>
+                  <option value="marine">Marine Notice</option>
+                  <option value="map">Treasure Map</option>
+                </select>
+              </div>
+            </div>
+
+            <label>Badges</label>
+            <div class="badge-list" id="badgeList"></div>
 
             <label for="notes">Notes</label>
             <textarea id="notes" placeholder="3 bed minimum • VA loan • prefers South Tacoma"></textarea>
@@ -193,167 +191,178 @@
         </div>
       </section>
 
+      <!-- RIGHT SIDE -->
       <section>
         <div class="head" style="display:flex; align-items:center; justify-content:space-between">
           <h2>Posters</h2>
-          <div class="muted">Saved locally on this device</div>
+          <div class="filters">
+            <select id="filterAgent"><option value="">All agents</option></select>
+            <select id="filterStage">
+              <option value="">All stages</option>
+              <option>Pre-Approval</option>
+              <option>Searching</option>
+              <option>Under Contract</option>
+              <option>Closed</option>
+            </select>
+          </div>
         </div>
         <div id="gallery" class="gallery"></div>
         <div id="empty" class="empty" style="display:none">No clients yet. Add one on the left to start your collection.</div>
+
+        <div class="board">
+          <div class="tile">
+            <h3>Leaderboard — Top Bounties</h3>
+            <div id="leaderTop" class="list"></div>
+          </div>
+          <div class="tile">
+            <h3>Agent Stats</h3>
+            <div id="agentStats" class="list"></div>
+          </div>
+          <div class="tile" style="grid-column:1/-1">
+            <h3>Stage Summary</h3>
+            <div id="stageStats" class="list"></div>
+          </div>
+        </div>
       </section>
     </div>
   </main>
 
-  <!-- html2canvas for PNG download -->
+  <canvas id="confetti" class="sr-only"></canvas>
+
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
+    const $ = s => document.querySelector(s); const $$ = s => Array.from(document.querySelectorAll(s));
 
-    const q = $('#q');
-    const form = $('#form');
-    const idInput = $('#id');
-    const nameInput = $('#name');
-    const amountInput = $('#amount');
-    const notesInput = $('#notes');
-    const photoInput = $('#photo');
-    const gallery = $('#gallery');
-    const empty = $('#empty');
-    const coinToggleBtn = $('#coinToggle');
+    const form = $('#form'); const idInput = $('#id'); const nameInput = $('#name');
+    const amountInput = $('#amount'); const notesInput = $('#notes'); const photoInput = $('#photo');
+    const agentInput = $('#agent'); const stageInput = $('#stage'); const themeInput = $('#theme');
+    const badgeList = $('#badgeList'); const gallery = $('#gallery'); const empty = $('#empty');
+    const coinToggleBtn = $('#coinToggle'); const q = $('#q');
+    const filterAgent = $('#filterAgent'); const filterStage = $('#filterStage');
 
-    let coinPreview = false;
+    const leaderTop = $('#leaderTop'); const agentStats = $('#agentStats'); const stageStats = $('#stageStats');
 
-    const storeKey = 'wanted_clients_v1';
+    const BADGES = [
+      ['first','First-time Buyer'], ['va','VA Loan'], ['lux','Luxury'], ['invest','Investor'],
+      ['pcs','PCS Military'], ['cash','Cash'], ['fha','FHA'], ['condo','Condo/Townhome']
+    ];
+
+    // Build badge checkboxes
+    BADGES.forEach(([id,label])=>{
+      const w = document.createElement('label'); w.className='chip';
+      w.innerHTML = `<input type=\"checkbox\" value=\"${id}\"> <span>${label}</span>`; badgeList.appendChild(w);
+    });
+
+    const storeKey = 'wanted_clients_v2';
     const load = () => JSON.parse(localStorage.getItem(storeKey) || '[]');
     const save = data => localStorage.setItem(storeKey, JSON.stringify(data));
 
-    function fmt(n){
-      try{ return Number(n).toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}); }
-      catch{ return "$" + n }
+    let coinPreview = false;
+
+    function fmt(n){ try{ return Number(n).toLocaleString('en-US',{style:'currency', currency:'USD', maximumFractionDigits:0}); }catch{ return '$'+n } }
+
+    function readFile(file){ return new Promise((resolve,reject)=>{ if(!file) return resolve(null); const fr=new FileReader(); fr.onload=()=>resolve(fr.result); fr.onerror=reject; fr.readAsDataURL(file); }); }
+
+    function playBeep(){ // tiny celebratory beep
+      const a = new (window.AudioContext||window.webkitAudioContext)();
+      const o = a.createOscillator(); const g = a.createGain(); o.type='triangle'; o.frequency.value=660; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.001, a.currentTime); g.gain.exponentialRampToValueAtTime(0.3, a.currentTime+.02); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime+.25); o.start(); o.stop(a.currentTime+.26);
     }
 
-    function readFile(file){
-      return new Promise((resolve,reject)=>{
-        if(!file) return resolve(null);
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result);
-        fr.onerror = reject;
-        fr.readAsDataURL(file);
-      });
+    // simple confetti burst
+    function confettiBurst(){
+      const c = $('#confetti'); const ctx = c.getContext('2d');
+      const W = c.width = window.innerWidth; const H = c.height = window.innerHeight;
+      c.classList.remove('sr-only'); c.style.position='fixed'; c.style.left=0; c.style.top=0; c.style.pointerEvents='none'; c.style.zIndex=9999;
+      const N = 120; const parts = Array.from({length:N},()=>({x:W/2,y:H/3,vx:(Math.random()-0.5)*6, vy: Math.random()*-6-3, s: Math.random()*6+3, a:1}));
+      let t=0; const loop=()=>{ t++; ctx.clearRect(0,0,W,H); parts.forEach(p=>{ p.vy+=0.18; p.x+=p.vx; p.y+=p.vy; p.a-=0.008; ctx.globalAlpha = Math.max(p.a,0); ctx.fillStyle = ['#d6b77d','#b9965c','#8d6f3d','#e9d6a1'][Math.floor(Math.random()*4)]; ctx.fillRect(p.x,p.y,p.s,p.s); }); if(t<260){ requestAnimationFrame(loop);} else { c.classList.add('sr-only'); }}; loop();
     }
+
+    function badgeLabels(keys){ const map = Object.fromEntries(BADGES); return (keys||[]).map(k=>map[k]).filter(Boolean); }
+
+    function collectAgents(list){ const set = new Set(list.map(x=>x.agent).filter(Boolean)); const cur = filterAgent.value; filterAgent.innerHTML = '<option value="">All agents</option>' + Array.from(set).sort().map(a=>`<option ${a===cur?'selected':''}>${a}</option>`).join(''); }
+
+    function tag(text){ const span=document.createElement('span'); span.className='tag'; span.textContent=text; return span; }
+    function btn(text, fn){ const b=document.createElement('button'); b.className='btn secondary'; b.textContent=text; b.addEventListener('click', fn); return b; }
+
+    async function downloadPoster(card, item){
+      const mini = card.querySelector('.mini-btns'); const stamp = card.querySelector('.stamp');
+      mini.style.visibility='hidden';
+      await html2canvas(card, {backgroundColor:null, scale:2}).then(canvas=>{ const a=document.createElement('a'); a.download=`${(item.name||'client').replace(/[^a-z0-9]+/ig,'_')}_poster.png`; a.href=canvas.toDataURL('image/png'); a.click(); }).finally(()=>{ mini.style.visibility=''; if(stamp) stamp.style.display = (item.stage==='Closed')?'block':'none'; });
+    }
+
+    function showCoin(container, item, opts={}){ const existing = container.querySelector('.coin'); if(existing) existing.remove(); const c=document.createElement('div'); c.className='coin'; const t=document.createElement('div'); t.className='coin-text'; t.innerHTML = `<div class=\"amt\">${fmt(item.amount)}</div><div class=\"nm\">${item.name}</div>`; c.appendChild(t); container.appendChild(c); if(!opts.silent) c.scrollIntoView({behavior:'smooth', block:'center'}); }
+
+    function editForm(item){ idInput.value=item.id; nameInput.value=item.name; amountInput.value=item.amount; notesInput.value=item.notes||''; agentInput.value=item.agent||''; stageInput.value=item.stage||'Searching'; themeInput.value=item.theme||'wanted'; $$('#badgeList input').forEach(cb=>{ cb.checked = (item.badges||[]).includes(cb.value); }); window.scrollTo({top:0, behavior:'smooth'}); }
+
+    function upsert(obj){ const list = load(); const i=list.findIndex(x=>x.id===obj.id); if(i>-1) list[i]=obj; else list.unshift(obj); save(list); render(list); }
 
     function render(list){
-      const term = (q.value||'').toLowerCase();
-      const filtered = list.filter(x => !term || (x.name.toLowerCase().includes(term) || (x.notes||'').toLowerCase().includes(term)));
-      gallery.innerHTML = '';
-      empty.style.display = filtered.length ? 'none' : '';
+      const term = (q.value||'').toLowerCase(); const byAgent = (filterAgent.value||''); const byStage = (filterStage.value||'');
+      const filtered = list.filter(x => (!term || [x.name, x.notes, x.agent].join(' ').toLowerCase().includes(term)) && (!byAgent || x.agent===byAgent) && (!byStage || x.stage===byStage));
 
-      filtered.forEach(item => {
-        const card = document.createElement('article');
-        card.className = 'poster';
-        card.dataset.id = item.id;
+      gallery.innerHTML=''; empty.style.display = filtered.length ? 'none' : '';
 
-        const poster = document.createElement('div');
-        poster.className = 'poster-body';
+      filtered.forEach(item=>{
+        const card = document.createElement('article'); card.className = 'poster theme-'+(item.theme||'wanted'); card.dataset.id = item.id;
+        const stamp = document.createElement('div'); stamp.className='stamp'; stamp.textContent='CLOSED'; if(item.stage==='Closed') stamp.style.display='block';
 
-        // Top heading
-        const top = document.createElement('div');
-        top.className = 'top';
-        top.innerHTML = `
-          <div class="wanted">WANTED <small>DEAD OR ALIVE</small></div>
-        `;
+        const top = document.createElement('div'); top.className='top'; top.innerHTML = `<div class=\"wanted\">${(item.theme==='marine'?'MARINE NOTICE':'WANTED')} <small>${(item.theme==='marine'?'PURSUIT ORDER':'DEAD OR ALIVE')}</small></div>`;
 
-        // Photo
-        const photo = document.createElement('div');
-        photo.className = 'photo';
-        const img = document.createElement('img');
-        if(item.photo) img.src = item.photo; else img.alt = 'No photo';
-        photo.appendChild(img);
-        const burn = document.createElement('div'); burn.className = 'burn';
-        photo.appendChild(burn);
+        const photo = document.createElement('div'); photo.className='photo'; const img=document.createElement('img'); if(item.photo) img.src=item.photo; else img.alt='No photo'; photo.appendChild(img); const burn=document.createElement('div'); burn.className='burn'; photo.appendChild(burn);
 
-        // Name & bounty
-        const name = document.createElement('div');
-        name.className = 'name';
-        name.textContent = item.name || 'Unknown Pirate';
+        const name = document.createElement('div'); name.className='name'; name.textContent=item.name||'Unknown Pirate';
+        const bounty = document.createElement('div'); bounty.className='bounty'; bounty.innerHTML = `<span class=\"label\">BOUNTY • APPROVED</span><span class=\"amount\">${fmt(item.amount)}</span>`;
 
-        const bounty = document.createElement('div');
-        bounty.className = 'bounty';
-        bounty.innerHTML = `<span class="label">BOUNTY • APPROVED</span><span class="amount">${fmt(item.amount)}</span>`;
+        const meta = document.createElement('div'); meta.className='meta'; meta.append(tag('Agent: '+(item.agent||'—'))); meta.append(tag('Stage: '+(item.stage||'—'))); badgeLabels(item.badges).forEach(b=> meta.append(tag(b)));
 
-        // Notes
-        const notes = document.createElement('div');
-        notes.className = 'notes';
-        notes.textContent = item.notes || '';
+        const notes = document.createElement('div'); notes.className='notes'; notes.textContent=item.notes||'';
 
-        // Footer
-        const foot = document.createElement('div');
-        foot.className = 'foot';
-        const sig = document.createElement('div');
-        sig.className = 'sig';
-        sig.textContent = '— Team DB —';
-        const mini = document.createElement('div');
-        mini.className = 'mini-btns';
+        const foot = document.createElement('div'); foot.className='foot'; const sig = document.createElement('div'); sig.className='sig'; sig.textContent='— Team DB —'; const mini = document.createElement('div'); mini.className='mini-btns';
 
-        const dl = document.createElement('button'); dl.className = 'btn'; dl.textContent = 'Download PNG';
-        dl.addEventListener('click', async () => {
-          // Temporarily remove buttons from capture
-          mini.style.visibility = 'hidden';
-          await html2canvas(card, {backgroundColor: null, scale: 2}).then(canvas => {
-            const a = document.createElement('a');
-            a.download = `${(item.name||'client').replace(/[^a-z0-9]+/ig,'_')}_poster.png`;
-            a.href = canvas.toDataURL('image/png');
-            a.click();
-          }).finally(()=>{
-            mini.style.visibility = '';
-          })
-        });
+        const dl = btn('Download PNG', ()=> downloadPoster(card, item));
+        const coin = btn('Coin', ()=> showCoin(card, item));
+        const edit = btn('Edit', ()=> editForm(item));
+        const del = btn('Delete', ()=> { const next = load().filter(x=>x.id!==item.id); save(next); render(next); updateBoards(next); }); del.classList.add('danger');
+        const stampBtn = btn('Mark Closed', ()=> { item.stage='Closed'; upsert(item); confettiBurst(); playBeep(); });
 
-        const coin = document.createElement('button'); coin.className = 'btn secondary'; coin.textContent = 'Coin';
-        coin.addEventListener('click', ()=> showCoin(card, item));
+        mini.append(dl, coin, edit, stampBtn, del); foot.append(sig, mini);
 
-        const edit = document.createElement('button'); edit.className = 'btn secondary'; edit.textContent = 'Edit';
-        edit.addEventListener('click', ()=> {
-          idInput.value = item.id; nameInput.value = item.name; amountInput.value = item.amount; notesInput.value = item.notes||''; window.scrollTo({top:0, behavior:'smooth'});
-        });
-
-        const del = document.createElement('button'); del.className = 'btn danger'; del.textContent = 'Delete';
-        del.addEventListener('click', ()=> {
-          const next = load().filter(x => x.id !== item.id);
-          save(next); render(next);
-        });
-
-        mini.append(dl, coin, edit, del);
-        foot.append(sig, mini);
-
-        // Build
-        poster.append(top, photo, name, bounty, notes, foot);
-        card.appendChild(poster);
+        const body = document.createElement('div'); body.append(top, photo, name, bounty, meta, notes, foot);
+        card.append(stamp, body);
         gallery.appendChild(card);
 
-        if(coinPreview) {
-          showCoin(card, item, {silent:true});
-        }
+        if(coinPreview) showCoin(card, item, {silent:true});
       });
+
+      collectAgents(load());
+      updateBoards(load());
     }
 
-    function showCoin(container, item, opts={}){
-      const existing = container.querySelector('.coin');
-      if(existing){ existing.remove(); }
-      const c = document.createElement('div'); c.className='coin';
-      const t = document.createElement('div'); t.className='coin-text';
-      t.innerHTML = `<div class="amt">${fmt(item.amount)}</div><div class="nm">${item.name}</div>`;
-      c.appendChild(t);
-      container.appendChild(c);
-      if(!opts.silent){ c.scrollIntoView({behavior:'smooth', block:'center'}); }
+    // Export/Import
+    $('#exportBtn').addEventListener('click', ()=>{ const data=load(); const blob=new Blob([JSON.stringify(data,null,2)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='clients_wanted_export.json'; a.click(); URL.revokeObjectURL(a.href); });
+
+    $('#importInput').addEventListener('change', async (e)=>{ const file=e.target.files?.[0]; if(!file) return; const text=await file.text(); try{ const data=JSON.parse(text); if(Array.isArray(data)){ save(data); render(data); } else { alert('Invalid file: expected an array.'); } }catch(err){ alert('Invalid JSON file.'); } e.target.value=''; });
+
+    function collectAgents(list){ const set = new Set(list.map(x=>x.agent).filter(Boolean)); const cur = filterAgent.value; filterAgent.innerHTML = '<option value="">All agents</option>' + Array.from(set).sort().map(a=>`<option ${a===cur?'selected':''}>${a}</option>`).join(''); }
+
+    function updateBoards(list){
+      const top = [...list].sort((a,b)=>b.amount-a.amount).slice(0,5);
+      leaderTop.innerHTML = top.map((x,i)=>`<div class=\"rowline\"><strong>#${i+1} ${x.name}</strong><span>${fmt(x.amount)}</span></div>`).join('') || '<div class="muted">No clients yet.</div>';
+
+      const byAgent = list.reduce((m,x)=>{ m[x.agent] = m[x.agent]||{total:0,count:0}; m[x.agent].total+=x.amount; m[x.agent].count++; return m; },{});
+      agentStats.innerHTML = Object.entries(byAgent).sort((a,b)=>b[1].total-a[1].total).map(([a,v])=>`<div class=\"rowline\"><strong>${a}</strong><span>${fmt(v.total)} • ${v.count} client(s)</span></div>`).join('') || '<div class="muted">No agents yet.</div>';
+
+      const stages = ['Pre-Approval','Searching','Under Contract','Closed'];
+      const byStage = list.reduce((m,x)=>{ m[x.stage]= (m[x.stage]||0)+1; return m; }, {});
+      stageStats.innerHTML = stages.map(s=>`<div class=\"rowline\"><strong>${s}</strong><span>${byStage[s]||0}</span></div>`).join('');
     }
 
-    function upsert(obj){
-      const list = load();
-      const i = list.findIndex(x => x.id === obj.id);
-      if(i>-1) list[i]=obj; else list.unshift(obj);
-      save(list); render(list);
-    }
+    // Inputs & boot
+    $('#resetBtn').addEventListener('click', ()=>{ form.reset(); idInput.value=''; $$('#badgeList input').forEach(x=> x.checked=false); });
+    q.addEventListener('input', ()=> render(load())); filterAgent.addEventListener('change', ()=> render(load())); filterStage.addEventListener('change', ()=> render(load()));
+    coinToggleBtn.addEventListener('click', ()=>{ coinPreview=!coinPreview; render(load()); });
+
+    function upsert(obj){ const list = load(); const i=list.findIndex(x=>x.id===obj.id); if(i>-1) list[i]=obj; else list.unshift(obj); save(list); render(list); }
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
@@ -361,55 +370,23 @@
       const name = nameInput.value.trim();
       const amount = Number(amountInput.value || 0);
       const notes = notesInput.value.trim();
+      const agent = agentInput.value.trim();
+      const stage = stageInput.value;
+      const theme = themeInput.value;
+      const badges = $$('#badgeList input:checked').map(x=>x.value);
       const photo = await readFile(photoInput.files?.[0]);
-
-      if(!name || !amount){ alert('Name and Approved Amount are required.'); return; }
-
-      const existing = load().find(x => x.id === id);
-      const merged = {
-        id,
-        name,
-        amount,
-        notes,
-        photo: photo ?? existing?.photo ?? null,
-        ts: Date.now()
-      };
-      upsert(merged);
-      form.reset(); idInput.value='';
+      if(!name || !amount || !agent){ alert('Name, Amount, and Agent are required.'); return; }
+      const existing = load().find(x=>x.id===id);
+      const merged = { id, name, amount, notes, agent, stage, theme, badges, photo: photo ?? existing?.photo ?? null, ts: Date.now() };
+      upsert(merged); form.reset(); idInput.value=''; $$('#badgeList input').forEach(x=> x.checked=false); playBeep();
     });
 
-    $('#resetBtn').addEventListener('click', ()=>{ form.reset(); idInput.value=''; });
-    q.addEventListener('input', ()=> render(load()));
+    // Build badges UI
+    const BADGES = window.BADGES || [
+      ['first','First-time Buyer'], ['va','VA Loan'], ['lux','Luxury'], ['invest','Investor'], ['pcs','PCS Military'], ['cash','Cash'], ['fha','FHA'], ['condo','Condo/Townhome']
+    ];
 
-    coinToggleBtn.addEventListener('click', ()=>{ coinPreview = !coinPreview; render(load()); });
-
-    // Export/Import
-    $('#exportBtn').addEventListener('click', ()=>{
-      const data = load();
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'clients_wanted_export.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-
-    $('#importInput').addEventListener('change', async (e)=>{
-      const file = e.target.files?.[0];
-      if(!file) return;
-      const text = await file.text();
-      try{
-        const data = JSON.parse(text);
-        if(Array.isArray(data)){
-          save(data); render(data);
-        } else {
-          alert('Invalid file: expected an array.');
-        }
-      }catch(err){ alert('Invalid JSON file.'); }
-      e.target.value='';
-    });
-
-    // Boot
+    // Initial render
     render(load());
   </script>
 </body>
